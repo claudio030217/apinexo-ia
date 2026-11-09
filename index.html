@@ -1,0 +1,375 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ApiNexo IA | Monitoreo Apícola</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{--green:#173f32;--green2:#28654c;--gold:#e5b957;--bg:#f4f6f2;--text:#17362b;--muted:#73847b;--line:#e3e9e2}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,Helvetica,sans-serif}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.sidebar{position:fixed;inset:0 auto 0 0;width:245px;background:var(--green);color:white;padding:26px 17px;z-index:10}
+.logo{font-size:25px;font-weight:800;letter-spacing:-1px;padding:8px 10px 30px}
+.logo span{color:var(--gold)}
+.logo small{display:block;font-size:10px;letter-spacing:2px;color:#c3d9cd;margin-top:5px}
+.nav{display:grid;gap:8px}
+.nav button{border:0;text-align:left;background:transparent;color:#d5e4da;border-radius:12px;padding:14px;font-weight:600}
+.nav button.active,.nav button:hover{background:#315f4d;color:white}
+.sidebar-foot{position:absolute;bottom:25px;font-size:11px;color:#a6c2b2}
+.main{margin-left:245px;padding:30px;max-width:1650px}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;gap:12px}
+.top h1{margin:0;font-size:26px}
+.muted{color:var(--muted);font-size:13px;line-height:1.6}
+.pill{display:inline-block;border-radius:30px;background:#e6f2e9;color:#286547;padding:8px 12px;font-size:11px;font-weight:700}
+.hero{background:linear-gradient(120deg,#173f32,#31765a);border-radius:22px;padding:30px;color:white;margin-bottom:20px;display:flex;justify-content:space-between;align-items:center}
+.hero h2{font-size:30px;margin:10px 0}
+.hero p{color:#d7e7dc;font-size:13px;max-width:600px;line-height:1.6}
+.hero-icon{font-size:75px;color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.two{display:grid;grid-template-columns:1.2fr 1fr;gap:16px}
+.card{background:white;border:1px solid var(--line);border-radius:18px;padding:22px;min-width:0;margin-bottom:16px}
+.card h3{margin:0 0 12px;font-size:16px}
+.metric{font-size:32px;font-weight:800;margin:12px 0 5px}
+.label{font-size:12px;color:var(--muted)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.status{font-size:11px;font-weight:700;border-radius:30px;padding:7px 11px;background:#e7f3ea;color:#277048}
+.status.warn{background:#fff0d6;color:#95620e}
+.status.critical{background:#fde8e5;color:#a63227}
+.btn{border:0;background:var(--green2);color:white;border-radius:10px;padding:12px 16px;font-size:12px;font-weight:700}
+.btn.secondary{background:#eaf2ec;color:var(--green)}
+input,select{width:100%;padding:12px;border:1px solid #d8e3da;border-radius:10px;background:white;color:var(--text);margin:6px 0 12px}
+label{font-size:12px;font-weight:700}
+.notice{background:#fff8e9;border:1px solid #f1e1b8;border-radius:12px;padding:14px;font-size:12px;color:#7d632e;line-height:1.6;margin-bottom:16px}
+.view{display:none}.view.active{display:block}
+.history{width:100%;border-collapse:collapse;font-size:12px}
+.history td,.history th{padding:12px 8px;text-align:left;border-bottom:1px solid var(--line)}
+.history th{color:var(--muted)}
+.alert{border-left:4px solid var(--gold);background:#f8faf7;border-radius:10px;padding:15px;margin:10px 0}
+.alert.critical{border-color:#c94c3d}
+.alert p{font-size:12px;color:#617468;line-height:1.6}
+#map{height:410px;border-radius:14px;background:#e8eee7}
+.map-list{font-size:12px;line-height:1.7}
+.source{display:block;color:var(--green2);padding:13px 0;border-bottom:1px solid var(--line);font-size:13px;text-decoration:none;font-weight:700}
+.source small{display:block;color:var(--muted);font-weight:400;margin-top:4px}
+.footer{margin:25px 0;color:var(--muted);font-size:11px;text-align:center}
+.mobile-nav{display:none}
+@media(max-width:900px){
+.sidebar{display:none}.main{margin:0;padding:20px 14px 100px}
+.grid,.two{grid-template-columns:1fr}
+.mobile-nav{display:flex;position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid var(--line);overflow-x:auto;z-index:20;padding:8px 5px calc(8px + env(safe-area-inset-bottom))}
+.mobile-nav button{min-width:76px;flex:1;background:none;border:0;color:#789084;font-size:10px;padding:9px 5px;border-radius:9px}
+.mobile-nav button.active{background:#e8f1e9;color:var(--green);font-weight:800}
+.hero{padding:22px}.hero h2{font-size:24px}.hero-icon{font-size:45px}
+.top h1{font-size:21px}#map{height:330px}
+}
+</style>
+</head>
+<body>
+
+<aside class="sidebar">
+<div class="logo">🐝 ApiNexo <span>IA</span><small>INTELIGENCIA APÍCOLA</small></div>
+<nav class="nav">
+<button data-page="inicio" class="active">▦ &nbsp; Panel principal</button>
+<button data-page="monitoreo">◉ &nbsp; Monitoreo</button>
+<button data-page="alertas">♧ &nbsp; Alertas</button>
+<button data-page="mapa">⌖ &nbsp; Mapa apícola</button>
+<button data-page="biblioteca">▤ &nbsp; Biblioteca</button>
+</nav>
+<div class="sidebar-foot">Prototipo académico · Versión demostrativa</div>
+</aside>
+
+<main class="main">
+<header class="top">
+<div><h1 id="pageTitle">Panel principal</h1><div class="muted">Plataforma de monitoreo apícola</div></div>
+<span class="pill">● Modo demostración</span>
+</header>
+
+<section id="inicio" class="view active">
+<div class="hero">
+<div><div style="color:#f0ca78;font-size:11px;font-weight:700;letter-spacing:2px">BIENVENIDO A APINEXO IA</div>
+<h2>Tu apiario, más conectado.</h2>
+<p>Monitorea las condiciones de tus colmenas, identifica cambios relevantes y organiza mejor tus revisiones.</p>
+<button class="btn" style="background:var(--gold);color:#243b2d" onclick="go('monitoreo')">Ver colmenas</button></div>
+<div class="hero-icon">🐝</div>
+</div>
+<div class="grid" id="metrics"></div>
+<div class="card"><div class="row"><h3>Estado de las colmenas</h3><button class="btn secondary" onclick="go('monitoreo')">Ver monitoreo</button></div><div class="grid" id="hives"></div></div>
+<div class="notice">Los datos iniciales son ejemplos. No existen sensores físicos conectados. Las alertas son orientativas y no constituyen diagnósticos apícolas.</div>
+</section>
+
+<section id="monitoreo" class="view">
+<div class="row"><div><h2>Monitoreo de colmenas</h2><p class="muted">Temperatura, humedad e historial de mediciones.</p></div></div>
+<div class="two">
+<div class="card">
+<h3>Seleccionar colmena</h3>
+<select id="hiveSelect"><option value="1">Colmena 01</option><option value="2">Colmena 02</option><option value="3">Colmena 03</option></select>
+<div class="grid" style="grid-template-columns:1fr 1fr">
+<div><div class="label">Temperatura</div><div class="metric" id="tempValue">—</div></div>
+<div><div class="label">Humedad relativa</div><div class="metric" id="humValue">—</div></div>
+</div>
+<div id="hiveState"></div>
+<h3 style="margin-top:24px">Últimas mediciones</h3>
+<table class="history"><thead><tr><th>Fecha</th><th>°C</th><th>HR</th></tr></thead><tbody id="historyBody"></tbody></table>
+</div>
+<div class="card">
+<h3>Registrar medición</h3>
+<p class="muted">Ingreso manual para pruebas. No representa lectura automática de sensores.</p>
+<form id="measureForm">
+<label>Temperatura (°C)<input id="temperature" type="number" step="0.1" min="-30" max="100" required placeholder="Ej.: 35.2"></label>
+<label>Humedad relativa (%)<input id="humidity" type="number" step="0.1" min="0" max="100" required placeholder="Ej.: 64"></label>
+<button class="btn" type="submit">Guardar medición</button>
+</form>
+<p id="saveMessage" class="muted"></p>
+<button class="btn secondary" id="resetData">Restaurar datos de demostración</button>
+</div>
+</div>
+</section>
+
+<section id="alertas" class="view">
+<h2>Centro de alertas</h2>
+<p class="muted">Detección experimental de valores extremos y cambios respecto a la medición anterior.</p>
+<div class="notice">Los umbrales son ilustrativos y deben validarse con especialistas. La temperatura depende de la ubicación del sensor y las condiciones de la colonia.</div>
+<div id="alertList"></div>
+</section>
+
+<section id="mapa" class="view">
+<h2>Mapa apícola</h2>
+<p class="muted">Ubicación de colmenas y avisos registrados manualmente.</p>
+<div class="notice">No hay alertas oficiales conectadas en tiempo real. No publiques coordenadas privadas de apiarios sin autorización.</div>
+<div class="two">
+<div class="card"><div id="map"></div><p id="mapMessage" class="muted">El mapa requiere conexión a internet.</p></div>
+<div class="card">
+<h3>Registrar ubicación</h3>
+<form id="mapForm">
+<label>Colmena<select id="mapHive"><option value="1">Colmena 01</option><option value="2">Colmena 02</option><option value="3">Colmena 03</option></select></label>
+<label>Latitud<input id="latitude" type="number" step="any" min="-90" max="90" required placeholder="-35.0"></label>
+<label>Longitud<input id="longitude" type="number" step="any" min="-180" max="180" required placeholder="-71.0"></label>
+<button class="btn" type="submit">Guardar ubicación</button>
+</form>
+<div class="map-list" id="mapLocations"></div>
+</div>
+</div>
+<div class="two">
+<div class="card">
+<h3>Avisos cercanos de prueba</h3>
+<p class="muted">Registra un aviso manual para comprobar la proximidad de las colmenas.</p>
+<form id="noticeForm">
+<label>Descripción<input id="noticeText" maxlength="120" required placeholder="Ej.: aviso de prueba en el sector"></label>
+<label>Latitud<input id="noticeLat" type="number" step="any" min="-90" max="90" required></label>
+<label>Longitud<input id="noticeLng" type="number" step="any" min="-180" max="180" required></label>
+<button class="btn" type="submit">Registrar aviso</button>
+</form>
+<div id="noticeList"></div>
+</div>
+<div class="card">
+<h3>Consultar fuentes oficiales</h3>
+<a class="source" href="https://www.senapred.cl/" target="_blank" rel="noopener">SENAPRED<small>Emergencias y recomendaciones</small></a>
+<a class="source" href="https://www.conaf.cl/" target="_blank" rel="noopener">CONAF<small>Información sobre incendios forestales</small></a>
+<a class="source" href="https://www.meteochile.gob.cl/" target="_blank" rel="noopener">Dirección Meteorológica de Chile<small>Pronósticos y avisos</small></a>
+<a class="source" href="https://www.sag.gob.cl/" target="_blank" rel="noopener">SAG<small>Información sanitaria y apícola</small></a>
+</div>
+</div>
+</section>
+
+<section id="biblioteca" class="view">
+<h2>Biblioteca apícola</h2>
+<p class="muted">Material técnico y documentos de consulta para el desarrollo del proyecto.</p>
+<div class="two">
+<div class="card">
+<h3>Agregar documento</h3>
+<p class="muted">Selecciona un PDF o documento de texto. Se abrirá localmente durante esta sesión.</p>
+<input id="documentFile" type="file" accept=".pdf,.txt,.md">
+<button class="btn" id="addDocument">Agregar documento</button>
+<p id="documentMessage" class="muted"></p>
+<div id="documentList"></div>
+</div>
+<div class="card">
+<h3>Fuentes de información</h3>
+<a class="source" href="https://www.inia.cl/" target="_blank" rel="noopener">INIA Chile<small>Investigación agropecuaria</small></a>
+<a class="source" href="https://www.sag.gob.cl/" target="_blank" rel="noopener">Servicio Agrícola y Ganadero<small>Sanidad y normativa</small></a>
+<a class="source" href="https://www.fao.org/" target="_blank" rel="noopener">FAO<small>Publicaciones técnicas</small></a>
+</div>
+</div>
+<div class="notice">Los documentos no se envían a un servidor ni entrenan una inteligencia artificial. Esta es una biblioteca local de consulta; al recargar la página debes volver a seleccionarlos.</div>
+</section>
+
+<footer class="footer">ApiNexo IA · Prototipo académico · Monitoreo preventivo, no diagnóstico sanitario</footer>
+</main>
+
+<nav class="mobile-nav">
+<button data-page="inicio" class="active">▦<br>Inicio</button>
+<button data-page="monitoreo">◉<br>Monitoreo</button>
+<button data-page="alertas">♧<br>Alertas</button>
+<button data-page="mapa">⌖<br>Mapa</button>
+<button data-page="biblioteca">▤<br>Biblioteca</button>
+</nav>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const initial={
+1:[{t:35.1,h:63},{t:35.2,h:64}],
+2:[{t:34.8,h:61},{t:36.7,h:72}],
+3:[{t:35.2,h:64},{t:35.3,h:65}]
+};
+let readings;
+try{readings=JSON.parse(localStorage.getItem("apinexo_readings"))||structuredClone(initial)}
+catch(e){readings=JSON.parse(JSON.stringify(initial))}
+for(let id of [1,2,3]){
+if(!Array.isArray(readings[id])||!readings[id].length)readings[id]=JSON.parse(JSON.stringify(initial[id]));
+}
+let positions=[],notices=[],docs=[],map=null,layer=null;
+try{
+let saved=JSON.parse(localStorage.getItem("apinexo_geo")||"{}");
+positions=Array.isArray(saved.positions)?saved.positions:[];
+notices=Array.isArray(saved.notices)?saved.notices:[];
+}catch(e){}
+function save(){
+try{
+localStorage.setItem("apinexo_readings",JSON.stringify(readings));
+localStorage.setItem("apinexo_geo",JSON.stringify({positions,notices}));
+}catch(e){}
+}
+function escapeText(s){
+return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function latest(id){return readings[id][readings[id].length-1]}
+function classify(id){
+let a=readings[id],v=latest(id),prev=a[a.length-2];
+if(v.t>=50||v.t<=0)return {level:"critical",label:"Revisión urgente",why:"Temperatura extrema. Comprobar medición y sensor."};
+if(v.h>=95)return {level:"critical",label:"Revisar humedad",why:"Humedad cercana a saturación. Comprobar medición, condensación y sensor."};
+if(prev&&(Math.abs(v.t-prev.t)>=2||Math.abs(v.h-prev.h)>=12))
+return {level:"warn",label:"Cambio inusual",why:"Variación importante respecto de la lectura anterior."};
+return {level:"normal",label:"Sin alerta destacada",why:"No se detectaron cambios destacados según criterios de demostración."};
+}
+function go(page){
+document.querySelectorAll(".view").forEach(e=>e.classList.toggle("active",e.id===page));
+document.querySelectorAll("[data-page]").forEach(e=>e.classList.toggle("active",e.dataset.page===page));
+$("pageTitle").textContent={inicio:"Panel principal",monitoreo:"Monitoreo",alertas:"Centro de alertas",mapa:"Mapa apícola",biblioteca:"Biblioteca apícola"}[page];
+window.scrollTo(0,0);
+if(page==="mapa")setTimeout(drawMap,100);
+}
+document.querySelectorAll("[data-page]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.page)));
+function render(){
+let warnings=[1,2,3].filter(id=>classify(id).level!=="normal").length;
+$("metrics").innerHTML=`
+<div class="card"><div class="label">Colmenas registradas</div><div class="metric">03</div><div class="muted">Modo demostración</div></div>
+<div class="card"><div class="label">Colmenas con alertas</div><div class="metric">${warnings}</div><div class="muted">Según criterios de prueba</div></div>
+<div class="card"><div class="label">Mediciones almacenadas</div><div class="metric">${[1,2,3].reduce((s,id)=>s+readings[id].length,0)}</div><div class="muted">En este navegador</div></div>`;
+$("hives").innerHTML=[1,2,3].map(id=>{
+let v=latest(id),c=classify(id);
+return `<div class="card" style="background:#f9fbf8;margin:0">
+<div class="row"><strong>Colmena 0${id}</strong><span class="status ${c.level}">${c.label}</span></div>
+<p class="muted">${v.t.toFixed(1)} °C · ${v.h.toFixed(1)} % HR</p>
+<button class="btn secondary" onclick="selectHive(${id})">Ver historial</button></div>`;
+}).join("");
+let id=Number($("hiveSelect").value),v=latest(id),c=classify(id);
+$("tempValue").textContent=v.t.toFixed(1)+" °C";
+$("humValue").textContent=v.h.toFixed(1)+" %";
+$("hiveState").innerHTML=`<span class="status ${c.level}">${c.label}</span><p class="muted">${c.why}</p>`;
+$("historyBody").innerHTML=readings[id].slice(-8).reverse().map(x=>
+`<tr><td>${escapeText(x.date||"Dato inicial")}</td><td>${x.t.toFixed(1)}</td><td>${x.h.toFixed(1)} %</td></tr>`).join("");
+$("alertList").innerHTML=[1,2,3].map(id=>{
+let c=classify(id);
+return `<div class="alert ${c.level}"><div class="row"><strong>Colmena 0${id}</strong><span class="status ${c.level}">${c.label}</span></div>
+<p>${c.why}</p><button class="btn secondary" onclick="selectHive(${id})">Revisar mediciones</button></div>`;
+}).join("");
+}
+function selectHive(id){$("hiveSelect").value=id;go("monitoreo");render()}
+$("hiveSelect").addEventListener("change",render);
+$("measureForm").addEventListener("submit",e=>{
+e.preventDefault();
+let id=Number($("hiveSelect").value),t=Number($("temperature").value),h=Number($("humidity").value);
+if(!Number.isFinite(t)||!Number.isFinite(h)||h<0||h>100||t< -30||t>100)return;
+readings[id].push({t,h,date:new Date().toLocaleString("es-CL")});
+save();render();$("measureForm").reset();
+$("saveMessage").textContent="✓ Medición manual guardada correctamente.";
+});
+$("resetData").addEventListener("click",()=>{
+if(!confirm("¿Restaurar las mediciones de demostración?"))return;
+readings=JSON.parse(JSON.stringify(initial));save();render();
+$("saveMessage").textContent="Datos restaurados.";
+});
+function valid(lat,lng){return Number.isFinite(lat)&&Number.isFinite(lng)&&Math.abs(lat)<=90&&Math.abs(lng)<=180}
+function distance(a,b){
+let r=Math.PI/180,dlat=(b.lat-a.lat)*r,dlng=(b.lng-a.lng)*r;
+let q=Math.sin(dlat/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dlng/2)**2;
+return 6371*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));
+}
+function drawMap(){
+if(!window.L){$("mapMessage").textContent="No se pudo cargar el mapa. Revisa tu conexión a internet.";return}
+if(!map){
+map=L.map("map").setView([-35,-71],6);
+L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:18,attribution:"© OpenStreetMap contributors"}).addTo(map);
+layer=L.layerGroup().addTo(map);
+}
+layer.clearLayers();
+let bounds=[];
+positions.forEach(p=>{
+L.marker([p.lat,p.lng]).addTo(layer).bindPopup("Colmena 0"+p.id+" · Ubicación manual");
+bounds.push([p.lat,p.lng]);
+});
+notices.forEach(n=>{
+L.circleMarker([n.lat,n.lng],{radius:9,color:"#b86c32"}).addTo(layer).bindPopup("Aviso manual: "+escapeText(n.text));
+bounds.push([n.lat,n.lng]);
+});
+if(bounds.length)map.fitBounds(bounds,{padding:[30,30],maxZoom:12});
+map.invalidateSize();
+$("mapMessage").textContent="Ubicaciones y avisos registrados manualmente. Sin conexión a alertas oficiales.";
+}
+function renderGeo(){
+$("mapLocations").innerHTML=positions.map(p=>`<p>📍 Colmena 0${p.id}: ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}
+<button class="btn secondary" onclick="removePosition(${p.id})">Quitar</button></p>`).join("");
+$("noticeList").innerHTML=notices.map((n,i)=>{
+let near=positions.filter(p=>distance(p,n)<=10);
+return `<div class="alert"><strong>Aviso manual · No verificado</strong><p>${escapeText(n.text)}</p>
+<p>${near.length?"Colmenas a menos de 10 km: "+near.map(p=>"0"+p.id).join(", "):"Sin colmenas registradas a menos de 10 km."}</p>
+<button class="btn secondary" onclick="removeNotice(${i})">Quitar</button></div>`;
+}).join("");
+if(map)drawMap();
+}
+function removePosition(id){positions=positions.filter(p=>p.id!==id);save();renderGeo()}
+function removeNotice(i){notices.splice(i,1);save();renderGeo()}
+$("mapForm").addEventListener("submit",e=>{
+e.preventDefault();
+let id=Number($("mapHive").value),lat=Number($("latitude").value),lng=Number($("longitude").value);
+if(!valid(lat,lng))return;
+positions=positions.filter(p=>p.id!==id);
+positions.push({id,lat,lng});save();renderGeo();
+});
+$("noticeForm").addEventListener("submit",e=>{
+e.preventDefault();
+let lat=Number($("noticeLat").value),lng=Number($("noticeLng").value),text=$("noticeText").value.trim();
+if(!valid(lat,lng)||!text)return;
+notices.push({lat,lng,text:text.slice(0,120)});save();renderGeo();
+$("noticeForm").reset();
+});
+function renderDocs(){
+$("documentList").innerHTML=docs.map((d,i)=>`<div class="alert">
+<strong>${escapeText(d.name)}</strong>
+<p>Documento local · ${(d.size/1024).toFixed(1)} KB</p>
+<button class="btn secondary" onclick="openDoc(${i})">Abrir</button>
+<button class="btn secondary" onclick="removeDoc(${i})">Quitar</button>
+</div>`).join("");
+}
+function openDoc(i){if(docs[i])window.open(docs[i].url,"_blank")}
+function removeDoc(i){URL.revokeObjectURL(docs[i].url);docs.splice(i,1);renderDocs()}
+$("addDocument").addEventListener("click",()=>{
+let f=$("documentFile").files[0];
+if(!f){$("documentMessage").textContent="Selecciona un archivo.";return}
+let ext=f.name.split(".").pop().toLowerCase();
+if(!["pdf","txt","md"].includes(ext)||f.size>15*1024*1024){
+$("documentMessage").textContent="Solo PDF, TXT o MD de hasta 15 MB.";return;
+}
+docs.push({name:f.name,size:f.size,url:URL.createObjectURL(f)});
+$("documentMessage").textContent="✓ Documento añadido para esta sesión.";
+$("documentFile").value="";renderDocs();
+});
+render();renderGeo();renderDocs();
+</script>
+</body>
+</html>
