@@ -4,51 +4,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ApiNexo IA | Monitoreo Apícola</title>
+<meta name="theme-color" content="#173f32">
+<title>ApiNexo IA | Plataforma de Monitoreo Apícola</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <style>
-:root {
+:root{
   --green:#173f32;
   --green2:#28654c;
+  --green3:#327a58;
   --gold:#e5b957;
   --bg:#f4f6f2;
   --text:#17362b;
   --muted:#73847b;
   --line:#e3e9e2;
+  --white:#fff;
 }
-* { box-sizing:border-box; }
-body {
+*{box-sizing:border-box}
+body{
   margin:0;
   background:var(--bg);
   color:var(--text);
   font-family:Arial,Helvetica,sans-serif;
 }
-button,input,select { font:inherit; }
-button { cursor:pointer; }
-.sidebar {
+button,input,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{
+  outline:3px solid #e5b957;
+  outline-offset:2px;
+}
+.sidebar{
   position:fixed;
   inset:0 auto 0 0;
   width:245px;
   background:var(--green);
   color:white;
   padding:26px 17px;
-  z-index:10;
+  z-index:1000;
 }
-.logo {
+.logo{
   font-size:25px;
   font-weight:800;
+  letter-spacing:-1px;
   padding:8px 10px 30px;
 }
-.logo span { color:var(--gold); }
-.logo small {
+.logo span{color:var(--gold)}
+.logo small{
   display:block;
   font-size:10px;
   letter-spacing:2px;
   color:#c3d9cd;
   margin-top:5px;
 }
-.nav { display:grid;gap:8px; }
-.nav button {
+.nav{display:grid;gap:8px}
+.nav button{
   border:0;
   text-align:left;
   background:transparent;
@@ -57,29 +65,35 @@ button { cursor:pointer; }
   padding:14px;
   font-weight:600;
 }
-.nav button.active,.nav button:hover {
+.nav button.active,.nav button:hover{
   background:#315f4d;
   color:white;
 }
-.main {
+.sidebar-foot{
+  position:absolute;
+  bottom:25px;
+  font-size:11px;
+  color:#a6c2b2;
+}
+.main{
   margin-left:245px;
   padding:30px;
   max-width:1650px;
 }
-.top {
+.top{
   display:flex;
   align-items:center;
   justify-content:space-between;
   margin-bottom:24px;
   gap:12px;
 }
-.top h1 { margin:0;font-size:26px; }
-.muted {
+.top h1{margin:0;font-size:26px}
+.muted{
   color:var(--muted);
   font-size:13px;
   line-height:1.6;
 }
-.pill {
+.pill{
   display:inline-block;
   border-radius:30px;
   background:#e6f2e9;
@@ -88,30 +102,36 @@ button { cursor:pointer; }
   font-size:11px;
   font-weight:700;
 }
-.hero {
+.hero{
   background:linear-gradient(120deg,#173f32,#31765a);
   border-radius:22px;
   padding:30px;
   color:white;
   margin-bottom:20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
 }
-.hero h2 { font-size:30px;margin:10px 0; }
-.hero p {
+.hero h2{font-size:30px;margin:10px 0}
+.hero p{
   color:#d7e7dc;
   font-size:13px;
-  line-height:1.6;
+  max-width:600px;
+  line-height:1.7;
 }
-.grid {
+.hero-icon{font-size:75px}
+.grid{
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
   gap:16px;
 }
-.two {
+.two{
   display:grid;
   grid-template-columns:1.2fr 1fr;
   gap:16px;
 }
-.card {
+.card{
   background:white;
   border:1px solid var(--line);
   border-radius:18px;
@@ -119,21 +139,21 @@ button { cursor:pointer; }
   min-width:0;
   margin-bottom:16px;
 }
-.card h3 { margin:0 0 12px;font-size:16px; }
-.metric {
+.card h3{margin:0 0 12px;font-size:16px}
+.metric{
   font-size:32px;
   font-weight:800;
   margin:12px 0 5px;
 }
-.label { font-size:12px;color:var(--muted); }
-.row {
+.label{font-size:12px;color:var(--muted)}
+.row{
   display:flex;
   justify-content:space-between;
   align-items:center;
   gap:12px;
   flex-wrap:wrap;
 }
-.status {
+.status{
   display:inline-block;
   font-size:11px;
   font-weight:700;
@@ -142,15 +162,15 @@ button { cursor:pointer; }
   background:#e7f3ea;
   color:#277048;
 }
-.status.warn {
+.status.warn{
   background:#fff0d6;
   color:#95620e;
 }
-.status.critical {
+.status.critical{
   background:#fde8e5;
   color:#a63227;
 }
-.btn {
+.btn{
   border:0;
   background:var(--green2);
   color:white;
@@ -159,13 +179,14 @@ button { cursor:pointer; }
   font-size:12px;
   font-weight:700;
 }
-.btn.secondary {
+.btn:hover{filter:brightness(1.08)}
+.btn.secondary{
   background:#eaf2ec;
   color:var(--green);
 }
-.btn.stop { background:#a63d32; }
-.btn:disabled { opacity:.45;cursor:not-allowed; }
-input,select {
+.btn.stop{background:#a63d32}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+input,select{
   width:100%;
   padding:12px;
   border:1px solid #d8e3da;
@@ -174,8 +195,8 @@ input,select {
   color:var(--text);
   margin:6px 0 12px;
 }
-label { font-size:12px;font-weight:700; }
-.notice {
+label{font-size:12px;font-weight:700}
+.notice{
   background:#fff8e9;
   border:1px solid #f1e1b8;
   border-radius:12px;
@@ -185,52 +206,52 @@ label { font-size:12px;font-weight:700; }
   line-height:1.6;
   margin-bottom:16px;
 }
-.view { display:none; }
-.view.active { display:block; }
-.history {
+.view{display:none}
+.view.active{display:block}
+.history{
   width:100%;
   border-collapse:collapse;
   font-size:12px;
 }
-.history td,.history th {
+.history td,.history th{
   padding:12px 8px;
   text-align:left;
   border-bottom:1px solid var(--line);
 }
-.history th { color:var(--muted); }
-.alert {
+.history th{color:var(--muted)}
+.alert{
   border-left:4px solid var(--gold);
   background:#f8faf7;
   border-radius:10px;
   padding:15px;
   margin:10px 0;
 }
-.alert.critical { border-color:#c94c3d; }
-.alert p {
+.alert.critical{border-color:#c94c3d}
+.alert p{
   font-size:12px;
   color:#617468;
   line-height:1.6;
 }
-.analysis {
+.analysis{
   background:#f0f6f0;
   border:1px solid #dbe9dc;
   border-radius:14px;
   padding:18px;
   margin:18px 0;
 }
-.analysis ul {
+.analysis ul{
   padding-left:19px;
   font-size:12px;
   line-height:1.8;
   color:#425f4e;
 }
-.sim-actions {
+.sim-actions{
   display:flex;
   gap:9px;
   flex-wrap:wrap;
   margin-top:12px;
 }
-.sim-live {
+.sim-live{
   display:flex;
   align-items:center;
   gap:8px;
@@ -239,31 +260,34 @@ label { font-size:12px;font-weight:700; }
   margin:12px 0;
   color:#677d70;
 }
-.sim-dot {
+.sim-dot{
   width:9px;
   height:9px;
   border-radius:50%;
   background:#aab8ae;
 }
-.sim-live.on .sim-dot {
+.sim-live.on .sim-dot{
   background:#26a35b;
   box-shadow:0 0 0 4px #d9f1e0;
+  animation:pulse 1.5s infinite;
 }
-.chart {
+@keyframes pulse{50%{opacity:.4}}
+.chart{
   width:100%;
   height:160px;
   background:#f8faf7;
   border-radius:12px;
   padding:10px;
 }
-.chart svg { width:100%;height:100%; }
-.chart text { font-size:10px;fill:#748579; }
-#map {
+.chart svg{width:100%;height:100%}
+.chart text{font-size:10px;fill:#748579}
+#map{
   height:410px;
   border-radius:14px;
   background:#e8eee7;
+  z-index:1;
 }
-.source {
+.source{
   display:block;
   color:var(--green2);
   padding:13px 0;
@@ -272,24 +296,24 @@ label { font-size:12px;font-weight:700; }
   text-decoration:none;
   font-weight:700;
 }
-.source small {
+.source small{
   display:block;
   color:var(--muted);
   font-weight:400;
   margin-top:4px;
 }
-.footer {
+.footer{
   margin:25px 0;
   color:var(--muted);
   font-size:11px;
   text-align:center;
 }
-.mobile-nav { display:none; }
-@media(max-width:900px) {
-  .sidebar { display:none; }
-  .main { margin:0;padding:20px 14px 100px; }
-  .grid,.two { grid-template-columns:1fr; }
-  .mobile-nav {
+.mobile-nav{display:none}
+@media(max-width:900px){
+  .sidebar{display:none}
+  .main{margin:0;padding:20px 14px 100px}
+  .grid,.two{grid-template-columns:1fr}
+  .mobile-nav{
     display:flex;
     position:fixed;
     bottom:0;
@@ -297,26 +321,30 @@ label { font-size:12px;font-weight:700; }
     right:0;
     background:white;
     border-top:1px solid var(--line);
-    z-index:20;
+    overflow-x:auto;
+    z-index:1000;
     padding:8px 5px calc(8px + env(safe-area-inset-bottom));
   }
-  .mobile-nav button {
+  .mobile-nav button{
+    min-width:70px;
     flex:1;
-    min-width:0;
     background:none;
     border:0;
     color:#789084;
     font-size:10px;
     padding:9px 5px;
+    border-radius:9px;
   }
-  .mobile-nav button.active {
+  .mobile-nav button.active{
     background:#e8f1e9;
     color:var(--green);
     font-weight:800;
   }
-  .hero h2 { font-size:24px; }
-  .top h1 { font-size:21px; }
-  #map { height:330px; }
+  .hero{padding:22px}
+  .hero h2{font-size:24px}
+  .hero-icon{font-size:45px}
+  .top h1{font-size:21px}
+  #map{height:330px}
 }
 </style>
 </head>
@@ -328,15 +356,13 @@ label { font-size:12px;font-weight:700; }
     <small>INTELIGENCIA APÍCOLA</small>
   </div>
   <nav class="nav">
-    <button data-page="inicio" class="active">▦ Panel principal</button>
-    <button data-page="monitoreo">◉ Monitoreo</button>
-    <button data-page="alertas">♧ Alertas</button>
-    <button data-page="mapa">⌖ Mapa apícola</button>
-    <button data-page="biblioteca">▤ Biblioteca</button>
+    <button data-page="inicio" class="active">▦ &nbsp; Panel principal</button>
+    <button data-page="monitoreo">◉ &nbsp; Monitoreo</button>
+    <button data-page="alertas">♧ &nbsp; Alertas</button>
+    <button data-page="mapa">⌖ &nbsp; Mapa apícola</button>
+    <button data-page="biblioteca">▤ &nbsp; Biblioteca</button>
   </nav>
-  <p style="position:absolute;bottom:15px;font-size:11px;color:#bcd6c6">
-    Prototipo académico · Demostración
-  </p>
+  <div class="sidebar-foot">ApiNexo IA · Gestión apícola inteligente</div>
 </aside>
 
 <main class="main">
@@ -344,25 +370,30 @@ label { font-size:12px;font-weight:700; }
 <header class="top">
   <div>
     <h1 id="pageTitle">Panel principal</h1>
-    <div class="muted">Plataforma de monitoreo apícola</div>
+    <div class="muted">Plataforma inteligente de monitoreo apícola</div>
   </div>
-  <span class="pill">● Modo demostración</span>
+  <span class="pill">● Plataforma disponible</span>
 </header>
 
 <section id="inicio" class="view active">
   <div class="hero">
-    <div style="color:#f0ca78;font-size:11px;font-weight:700;letter-spacing:2px">
-      BIENVENIDO A APINEXO IA
+    <div>
+      <div style="color:#f0ca78;font-size:11px;font-weight:700;letter-spacing:2px">
+        BIENVENIDO A APINEXO IA
+      </div>
+      <h2>Tu apiario, más conectado.</h2>
+      <p>
+        Centraliza la información de tus colmenas,
+        analiza su comportamiento y detecta cambios
+        que requieren atención.
+      </p>
+      <button class="btn"
+        style="background:var(--gold);color:#243b2d"
+        onclick="go('monitoreo')">
+        Explorar monitoreo
+      </button>
     </div>
-    <h2>Tu apiario, más conectado. 🐝</h2>
-    <p>
-      Registra condiciones, analiza tendencias históricas
-      y detecta cambios relevantes en tus colmenas.
-    </p>
-    <button class="btn" style="background:var(--gold);color:#243b2d"
-      onclick="go('monitoreo')">
-      Ver colmenas
-    </button>
+    <div class="hero-icon">🐝</div>
   </div>
 
   <div class="grid" id="metrics"></div>
@@ -376,16 +407,14 @@ label { font-size:12px;font-weight:700; }
     </div>
     <div class="grid" id="hives"></div>
   </div>
-
-  <div class="notice">
-    Los datos iniciales son ejemplos. No hay sensores físicos conectados.
-    Las interpretaciones son experimentales y no equivalen a diagnósticos apícolas.
-  </div>
 </section>
 
 <section id="monitoreo" class="view">
   <h2>Monitoreo de colmenas</h2>
-  <p class="muted">Mediciones, tendencias, historial y simulación.</p>
+  <p class="muted">
+    Consulta mediciones, identifica tendencias
+    y revisa el comportamiento histórico.
+  </p>
 
   <div class="two">
     <div class="card">
@@ -418,7 +447,7 @@ label { font-size:12px;font-weight:700; }
       <h3>Evolución de temperatura</h3>
       <div class="chart" id="tempChart"></div>
 
-      <h3 style="margin-top:24px">Últimas mediciones</h3>
+      <h3 style="margin-top:24px">Historial de mediciones</h3>
       <div style="overflow-x:auto">
         <table class="history">
           <thead>
@@ -435,33 +464,34 @@ label { font-size:12px;font-weight:700; }
     </div>
 
     <div class="card">
-      <h3>Registrar medición</h3>
-      <p class="muted">Ingreso manual para pruebas.</p>
+      <h3>Registro de mediciones</h3>
+      <p class="muted">
+        Incorpora nuevas lecturas para actualizar
+        el historial de la colmena.
+      </p>
 
       <form id="measureForm">
         <label>Temperatura (°C)
           <input id="temperature" type="number" step="0.1"
-            min="-30" max="100" required placeholder="35.2">
+            min="-30" max="100" required placeholder="Ej.: 35.2">
         </label>
-
         <label>Humedad relativa (%)
           <input id="humidity" type="number" step="0.1"
-            min="0" max="100" required placeholder="64">
+            min="0" max="100" required placeholder="Ej.: 64">
         </label>
-
         <button class="btn" type="submit">Guardar medición</button>
       </form>
 
       <p id="saveMessage" class="muted"></p>
 
       <div class="analysis">
-        <h3>📡 Simulador de sensores</h3>
+        <h3>📡 Pruebas de monitoreo</h3>
         <p class="muted">
-          Genera mediciones ficticias cada tres segundos
-          para comprobar el análisis y las alertas.
+          Genera lecturas de prueba para evaluar
+          las tendencias, el historial y las alertas.
         </p>
 
-        <label>Escenario de simulación
+        <label>Escenario
           <select id="simScenario">
             <option value="stable">Condiciones estables</option>
             <option value="heat">Aumento gradual de temperatura</option>
@@ -472,14 +502,15 @@ label { font-size:12px;font-weight:700; }
 
         <div class="sim-live" id="simStatus">
           <span class="sim-dot"></span>
-          <span id="simText">Simulador detenido</span>
+          <span id="simText">Prueba detenida</span>
         </div>
 
         <div class="sim-actions">
           <button class="btn" id="startSim" type="button">
-            ▶ Iniciar simulación
+            ▶ Iniciar prueba
           </button>
-          <button class="btn stop" id="stopSim" type="button" disabled>
+          <button class="btn stop" id="stopSim"
+            type="button" disabled>
             ■ Detener
           </button>
         </div>
@@ -488,7 +519,7 @@ label { font-size:12px;font-weight:700; }
       </div>
 
       <button class="btn secondary" id="resetData" type="button">
-        Restaurar datos de demostración
+        Restaurar datos iniciales
       </button>
     </div>
   </div>
@@ -497,37 +528,29 @@ label { font-size:12px;font-weight:700; }
 <section id="alertas" class="view">
   <h2>Centro de alertas</h2>
   <p class="muted">
-    Interpretación del historial y explicación de los cambios detectados.
+    Seguimiento de cambios, tendencias
+    y condiciones que requieren revisión.
   </p>
-
-  <div class="notice">
-    Los umbrales son experimentales, no estándares sanitarios validados.
-    El significado de una medición depende de la ubicación del sensor,
-    la frecuencia de lectura y el contexto de la colonia.
-  </div>
-
   <div id="alertList"></div>
 </section>
 
 <section id="mapa" class="view">
   <h2>Mapa apícola</h2>
-  <p class="muted">Ubicaciones y avisos manuales de prueba.</p>
-
-  <div class="notice">
-    No hay alertas oficiales conectadas en tiempo real.
-    No compartas coordenadas privadas de apiarios sin autorización.
-  </div>
+  <p class="muted">
+    Visualiza las ubicaciones registradas
+    y consulta avisos asociados al territorio.
+  </p>
 
   <div class="two">
     <div class="card">
       <div id="map"></div>
       <p id="mapMessage" class="muted">
-        El mapa requiere conexión a internet.
+        Cargando mapa...
       </p>
     </div>
 
     <div class="card">
-      <h3>Registrar ubicación</h3>
+      <h3>Ubicación de colmenas</h3>
       <form id="mapForm">
         <label>Colmena
           <select id="mapHive">
@@ -544,7 +567,9 @@ label { font-size:12px;font-weight:700; }
           <input id="longitude" type="number" step="any"
             min="-180" max="180" required>
         </label>
-        <button class="btn" type="submit">Guardar ubicación</button>
+        <button class="btn" type="submit">
+          Guardar ubicación
+        </button>
       </form>
       <div id="mapLocations"></div>
     </div>
@@ -552,15 +577,16 @@ label { font-size:12px;font-weight:700; }
 
   <div class="two">
     <div class="card">
-      <h3>Avisos cercanos de prueba</h3>
+      <h3>Avisos territoriales</h3>
       <p class="muted">
-        Registra un aviso manual y comprueba qué colmenas
-        se encuentran a menos de 10 kilómetros.
+        Registra avisos manuales y comprueba
+        su proximidad a las colmenas.
       </p>
 
       <form id="noticeForm">
         <label>Descripción
-          <input id="noticeText" maxlength="120" required>
+          <input id="noticeText" maxlength="120" required
+            placeholder="Descripción del aviso">
         </label>
         <label>Latitud
           <input id="noticeLat" type="number" step="any"
@@ -570,28 +596,33 @@ label { font-size:12px;font-weight:700; }
           <input id="noticeLng" type="number" step="any"
             min="-180" max="180" required>
         </label>
-        <button class="btn" type="submit">Registrar aviso</button>
+        <button class="btn" type="submit">
+          Registrar aviso
+        </button>
       </form>
-
       <div id="noticeList"></div>
     </div>
 
     <div class="card">
-      <h3>Fuentes oficiales</h3>
+      <h3>Información territorial</h3>
       <a class="source" href="https://www.senapred.cl/"
-        target="_blank" rel="noopener">SENAPRED
+        target="_blank" rel="noopener">
+        SENAPRED
         <small>Emergencias y recomendaciones</small>
       </a>
       <a class="source" href="https://www.conaf.cl/"
-        target="_blank" rel="noopener">CONAF
-        <small>Información forestal</small>
+        target="_blank" rel="noopener">
+        CONAF
+        <small>Información sobre incendios forestales</small>
       </a>
       <a class="source" href="https://www.meteochile.gob.cl/"
-        target="_blank" rel="noopener">Meteorología de Chile
+        target="_blank" rel="noopener">
+        Dirección Meteorológica de Chile
         <small>Pronósticos y avisos</small>
       </a>
       <a class="source" href="https://www.sag.gob.cl/"
-        target="_blank" rel="noopener">SAG
+        target="_blank" rel="noopener">
+        SAG
         <small>Información sanitaria y apícola</small>
       </a>
     </div>
@@ -600,15 +631,20 @@ label { font-size:12px;font-weight:700; }
 
 <section id="biblioteca" class="view">
   <h2>Biblioteca apícola</h2>
-  <p class="muted">Documentos y fuentes de consulta.</p>
+  <p class="muted">
+    Organiza documentación y accede
+    a fuentes de información especializada.
+  </p>
 
   <div class="two">
     <div class="card">
-      <h3>Agregar documento</h3>
+      <h3>Documentos de consulta</h3>
       <p class="muted">
-        Selecciona un PDF, TXT o MD para abrirlo localmente.
+        Agrega archivos PDF o documentos de texto
+        para consultarlos durante la sesión.
       </p>
-      <input id="documentFile" type="file" accept=".pdf,.txt,.md">
+      <input id="documentFile" type="file"
+        accept=".pdf,.txt,.md">
       <button class="btn" id="addDocument" type="button">
         Agregar documento
       </button>
@@ -617,32 +653,29 @@ label { font-size:12px;font-weight:700; }
     </div>
 
     <div class="card">
-      <h3>Fuentes de información</h3>
+      <h3>Fuentes especializadas</h3>
       <a class="source" href="https://www.inia.cl/"
-        target="_blank" rel="noopener">INIA Chile
+        target="_blank" rel="noopener">
+        INIA Chile
         <small>Investigación agropecuaria</small>
       </a>
       <a class="source" href="https://www.sag.gob.cl/"
-        target="_blank" rel="noopener">Servicio Agrícola y Ganadero
+        target="_blank" rel="noopener">
+        Servicio Agrícola y Ganadero
         <small>Sanidad y normativa</small>
       </a>
       <a class="source" href="https://www.fao.org/"
-        target="_blank" rel="noopener">FAO
+        target="_blank" rel="noopener">
+        FAO
         <small>Publicaciones técnicas</small>
       </a>
     </div>
   </div>
-
-  <div class="notice">
-    Los documentos no se envían a servidores ni entrenan una IA.
-    Deben seleccionarse nuevamente al recargar la página.
-  </div>
 </section>
 
 <footer class="footer">
-  ApiNexo IA · Prototipo académico · Monitoreo preventivo
+  ApiNexo IA · Tecnología aplicada al monitoreo apícola
 </footer>
-
 </main>
 
 <nav class="mobile-nav">
@@ -655,60 +688,68 @@ label { font-size:12px;font-weight:700; }
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const $ = id => document.getElementById(id);
+const $=id=>document.getElementById(id);
 
-const initial = {
+const initial={
   1:[{t:35.1,h:63},{t:35.2,h:64}],
   2:[{t:34.8,h:61},{t:36.7,h:72}],
   3:[{t:35.2,h:64},{t:35.3,h:65}]
 };
 
-function clone(obj) {
-  return JSON.parse(JSON.stringify(obj));
-}
+const clone=obj=>JSON.parse(JSON.stringify(obj));
 
 let readings;
-try {
-  readings = JSON.parse(localStorage.getItem("apinexo_readings"));
-} catch(e) {
-  readings = null;
+try{
+  readings=JSON.parse(
+    localStorage.getItem("apinexo_readings")
+  );
+}catch(e){
+  readings=null;
 }
-if (!readings || typeof readings !== "object") {
-  readings = clone(initial);
+
+if(!readings||typeof readings!=="object"){
+  readings=clone(initial);
 }
-for (const id of [1,2,3]) {
-  if (!Array.isArray(readings[id]) || !readings[id].length) {
-    readings[id] = clone(initial[id]);
+
+for(const id of [1,2,3]){
+  if(!Array.isArray(readings[id])||!readings[id].length){
+    readings[id]=clone(initial[id]);
   }
 }
 
-let positions = [];
-let notices = [];
-let docs = [];
-let map = null;
-let layer = null;
-let simTimer = null;
-let simCount = 0;
-let simHive = null;
-let simTemp = 35;
-let simHum = 64;
+let positions=[];
+let notices=[];
+let docs=[];
+let map=null;
+let layer=null;
+let simTimer=null;
+let simCount=0;
+let simHive=null;
+let simTemp=35;
+let simHum=64;
 
-try {
-  const geo = JSON.parse(localStorage.getItem("apinexo_geo") || "{}");
-  positions = Array.isArray(geo.positions) ? geo.positions : [];
-  notices = Array.isArray(geo.notices) ? geo.notices : [];
-} catch(e) {}
+try{
+  const geo=JSON.parse(
+    localStorage.getItem("apinexo_geo")||"{}"
+  );
+  positions=Array.isArray(geo.positions)?geo.positions:[];
+  notices=Array.isArray(geo.notices)?geo.notices:[];
+}catch(e){}
 
-function save() {
-  try {
-    localStorage.setItem("apinexo_readings",JSON.stringify(readings));
-    localStorage.setItem("apinexo_geo",JSON.stringify({positions,notices}));
-  } catch(e) {
-    console.warn("No fue posible guardar los datos.");
+function save(){
+  try{
+    localStorage.setItem(
+      "apinexo_readings",JSON.stringify(readings)
+    );
+    localStorage.setItem(
+      "apinexo_geo",JSON.stringify({positions,notices})
+    );
+  }catch(e){
+    console.warn("No se pudieron guardar los datos.");
   }
 }
 
-function esc(value) {
+function esc(value){
   return String(value).replace(/[&<>"']/g,c=>({
     "&":"&amp;",
     "<":"&lt;",
@@ -718,225 +759,202 @@ function esc(value) {
   }[c]));
 }
 
-function latest(id) {
-  const a = readings[id];
+function latest(id){
+  const a=readings[id];
   return a[a.length-1];
 }
 
-function average(values) {
+function average(values){
   return values.reduce((a,b)=>a+b,0)/values.length;
 }
 
 /*
- MOTOR DE ANÁLISIS HISTÓRICO
- Reglas experimentales, no validadas clínicamente.
- No equivale a inteligencia artificial entrenada.
+  ANÁLISIS HISTÓRICO
+  Reglas estadísticas experimentales.
+  No equivale a un diagnóstico sanitario.
 */
-function analyzeHistory(id) {
-  const all = readings[id];
-  const recent = all.slice(-10);
-  const last = recent[recent.length-1];
-  const previous = recent[recent.length-2];
+function analyzeHistory(id){
+  const all=readings[id];
+  const recent=all.slice(-10);
+  const last=recent[recent.length-1];
+  const previous=recent[recent.length-2];
 
-  let score = 0;
-  const details = [];
+  let score=0;
+  const details=[];
 
-  // 1. Valores extremos de prueba
-  if (last.t >= 50 || last.t <= 0) {
-    score = 3;
+  if(last.t>=50||last.t<=0){
+    score=3;
     details.push(
-      `Temperatura extrema registrada: ${last.t.toFixed(1)} °C. `+
-      `Verificar la medición, la ubicación y el funcionamiento del sensor.`
+      `Temperatura extrema registrada: `+
+      `${last.t.toFixed(1)} °C. `+
+      `Se recomienda verificar la medición y el sensor.`
     );
   }
 
-  if (last.h >= 95) {
-    score = 3;
+  if(last.h>=95){
+    score=3;
     details.push(
       `Humedad relativa de ${last.h.toFixed(1)} %. `+
-      `Comprobar la lectura y revisar posibles condiciones de condensación.`
+      `Se recomienda revisar la medición y `+
+      `las condiciones del entorno.`
     );
   }
 
-  // 2. Cambios entre dos lecturas
-  if (previous) {
-    const dt = last.t - previous.t;
-    const dh = last.h - previous.h;
+  if(previous){
+    const dt=last.t-previous.t;
+    const dh=last.h-previous.h;
 
-    if (Math.abs(dt) >= 2) {
-      score = Math.max(score,2);
+    if(Math.abs(dt)>=2){
+      score=Math.max(score,2);
       details.push(
-        `Cambio de temperatura entre las dos últimas lecturas: `+
-        `${dt>0?"+":""}${dt.toFixed(1)} °C.`
+        `Variación de temperatura entre las últimas `+
+        `dos lecturas: ${dt>0?"+":""}${dt.toFixed(1)} °C.`
       );
     }
 
-    if (Math.abs(dh) >= 12) {
-      score = Math.max(score,2);
+    if(Math.abs(dh)>=12){
+      score=Math.max(score,2);
       details.push(
-        `Cambio de humedad entre las dos últimas lecturas: `+
-        `${dh>0?"+":""}${dh.toFixed(1)} puntos porcentuales.`
+        `Variación de humedad entre las últimas `+
+        `dos lecturas: ${dh>0?"+":""}`+
+        `${dh.toFixed(1)} puntos porcentuales.`
       );
     }
   }
 
-  // 3. Promedio de lecturas anteriores
-  if (recent.length >= 4) {
-    const prior = recent.slice(0,-1);
-    const avgT = average(prior.map(x=>x.t));
-    const avgH = average(prior.map(x=>x.h));
+  if(recent.length>=4){
+    const prior=recent.slice(0,-1);
+    const avgT=average(prior.map(x=>x.t));
+    const avgH=average(prior.map(x=>x.h));
 
     details.push(
-      `Promedio previo: ${avgT.toFixed(1)} °C `+
+      `Promedio reciente: ${avgT.toFixed(1)} °C `+
       `y ${avgH.toFixed(1)} % de humedad.`
     );
 
-    const diffT = last.t-avgT;
-    const diffH = last.h-avgH;
-
-    if (Math.abs(diffT)>=2) {
-      score = Math.max(score,2);
+    if(Math.abs(last.t-avgT)>=2){
+      score=Math.max(score,2);
       details.push(
-        `La temperatura actual se aleja `+
-        `${Math.abs(diffT).toFixed(1)} °C del promedio reciente.`
+        `La temperatura actual presenta una diferencia `+
+        `de ${Math.abs(last.t-avgT).toFixed(1)} °C `+
+        `respecto al promedio reciente.`
       );
     }
 
-    if (Math.abs(diffH)>=12) {
-      score = Math.max(score,2);
+    if(Math.abs(last.h-avgH)>=12){
+      score=Math.max(score,2);
       details.push(
-        `La humedad actual se aleja `+
-        `${Math.abs(diffH).toFixed(1)} puntos del promedio reciente.`
-      );
-    }
-  }
-
-  // 4. Tendencias consecutivas
-  if (recent.length>=4) {
-    const lastFour = recent.slice(-4);
-
-    const tempChanges = [];
-    const humChanges = [];
-
-    for(let i=1;i<lastFour.length;i++) {
-      tempChanges.push(lastFour[i].t-lastFour[i-1].t);
-      humChanges.push(lastFour[i].h-lastFour[i-1].h);
-    }
-
-    const tempUp = tempChanges.every(v=>v>0.05);
-    const tempDown = tempChanges.every(v=>v< -0.05);
-    const humUp = humChanges.every(v=>v>0.05);
-    const humDown = humChanges.every(v=>v< -0.05);
-
-    const totalT = lastFour[3].t-lastFour[0].t;
-    const totalH = lastFour[3].h-lastFour[0].h;
-
-    if ((tempUp||tempDown)&&Math.abs(totalT)>=1.5) {
-      score = Math.max(score,1);
-      details.push(
-        `Tendencia de temperatura ${tempUp?"ascendente":"descendente"} `+
-        `durante cuatro lecturas: `+
-        `${totalT>0?"+":""}${totalT.toFixed(1)} °C acumulados.`
+        `La humedad actual presenta una diferencia `+
+        `de ${Math.abs(last.h-avgH).toFixed(1)} `+
+        `puntos respecto al promedio reciente.`
       );
     }
 
-    if ((humUp||humDown)&&Math.abs(totalH)>=8) {
-      score = Math.max(score,1);
+    const four=recent.slice(-4);
+    const tChanges=[];
+    const hChanges=[];
+
+    for(let i=1;i<four.length;i++){
+      tChanges.push(four[i].t-four[i-1].t);
+      hChanges.push(four[i].h-four[i-1].h);
+    }
+
+    const tUp=tChanges.every(v=>v>0.05);
+    const tDown=tChanges.every(v=>v< -0.05);
+    const hUp=hChanges.every(v=>v>0.05);
+    const hDown=hChanges.every(v=>v< -0.05);
+
+    const totalT=four[3].t-four[0].t;
+    const totalH=four[3].h-four[0].h;
+
+    if((tUp||tDown)&&Math.abs(totalT)>=1.5){
+      score=Math.max(score,1);
       details.push(
-        `Tendencia de humedad ${humUp?"ascendente":"descendente"} `+
-        `durante cuatro lecturas: `+
-        `${totalH>0?"+":""}${totalH.toFixed(1)} puntos acumulados.`
+        `Tendencia ${tUp?"ascendente":"descendente"} `+
+        `de temperatura durante cuatro lecturas: `+
+        `${totalT>0?"+":""}${totalT.toFixed(1)} °C.`
+      );
+    }
+
+    if((hUp||hDown)&&Math.abs(totalH)>=8){
+      score=Math.max(score,1);
+      details.push(
+        `Tendencia ${hUp?"ascendente":"descendente"} `+
+        `de humedad durante cuatro lecturas: `+
+        `${totalH>0?"+":""}${totalH.toFixed(1)} puntos.`
       );
     }
   }
 
-  // 5. Persistencia de desviaciones
-  if (recent.length>=6) {
-    const baseline = recent.slice(0,-3);
-    const finalThree = recent.slice(-3);
+  if(recent.length>=6){
+    const baseline=recent.slice(0,-3);
+    const finalThree=recent.slice(-3);
 
-    const avgT = average(baseline.map(x=>x.t));
-    const avgH = average(baseline.map(x=>x.h));
+    const avgT=average(baseline.map(x=>x.t));
+    const avgH=average(baseline.map(x=>x.h));
 
-    const persistentT = finalThree.every(
+    const persistentT=finalThree.every(
       x=>Math.abs(x.t-avgT)>=2
     );
-    const persistentH = finalThree.every(
+    const persistentH=finalThree.every(
       x=>Math.abs(x.h-avgH)>=12
     );
 
-    if (persistentT||persistentH) {
-      score = Math.max(score,2);
+    if(persistentT||persistentH){
+      score=Math.max(score,2);
       details.push(
-        `Desviación persistente durante las últimas tres lecturas `+
-        `en ${persistentT?"temperatura":""}`+
-        `${persistentT&&persistentH?" y ":""}`+
-        `${persistentH?"humedad":""}.`
+        "Se identificó una desviación persistente " +
+        "durante las últimas tres lecturas."
       );
     }
   }
 
-  // 6. Información del origen
-  const sources = [...new Set(
-    recent.map(x=>x.source||"Demo")
-  )];
-
-  if (details.length===0) {
+  if(!details.length){
     details.push(
-      "No se detectaron cambios destacados según los criterios de prueba."
+      "Las mediciones recientes no presentan " +
+      "cambios destacados según los criterios configurados."
     );
   }
+
+  const sources=[
+    ...new Set(recent.map(x=>x.source||"Demo"))
+  ];
 
   details.push(
-    `Análisis basado en ${recent.length} lecturas. `+
-    `Origen: ${sources.join(", ")}.`
+    `Análisis basado en ${recent.length} lecturas.`
   );
 
-  if (sources.includes("Simulación")) {
+  if(sources.includes("Simulación")||
+     sources.includes("Prueba automática")){
     details.push(
-      "Hay mediciones simuladas en el historial. " +
-      "Estas lecturas no representan condiciones reales de una colmena."
+      "El historial incluye lecturas generadas " +
+      "durante pruebas automáticas."
     );
   }
 
-  if (recent.length<4) {
-    details.push(
-      "Se necesitan más lecturas para evaluar tendencias y promedios."
-    );
-  }
-
-  const title =
-    score===3 ? "Lectura extrema" :
-    score===2 ? "Revisión recomendada" :
-    score===1 ? "Tendencia para observar" :
-    "Sin cambios destacados";
-
-  return {
-    level:score===3?"critical":score>0?"warn":"normal",
-    title,
+  return{
+    level:score===3?"critical":
+      score>0?"warn":"normal",
+    title:score===3?"Lectura extrema":
+      score===2?"Revisión recomendada":
+      score===1?"Tendencia detectada":
+      "Condiciones sin cambios destacados",
     details
   };
 }
 
-function classify(id) {
-  const a = analyzeHistory(id);
-  return {
-    level:a.level,
-    label:a.title,
-    why:a.details.join(" ")
-  };
-}
-
-function go(page) {
+function go(page){
   document.querySelectorAll(".view").forEach(
     e=>e.classList.toggle("active",e.id===page)
   );
 
   document.querySelectorAll("[data-page]").forEach(
-    e=>e.classList.toggle("active",e.dataset.page===page)
+    e=>e.classList.toggle(
+      "active",e.dataset.page===page
+    )
   );
 
-  $("pageTitle").textContent = {
+  $("pageTitle").textContent={
     inicio:"Panel principal",
     monitoreo:"Monitoreo",
     alertas:"Centro de alertas",
@@ -945,73 +963,99 @@ function go(page) {
   }[page];
 
   window.scrollTo(0,0);
-  if(page==="mapa") setTimeout(drawMap,100);
+
+  if(page==="mapa"){
+    setTimeout(drawMap,100);
+  }
 }
 
 document.querySelectorAll("[data-page]").forEach(
-  b=>b.addEventListener("click",()=>go(b.dataset.page))
+  b=>b.addEventListener(
+    "click",()=>go(b.dataset.page)
+  )
 );
 
-function renderChart(id) {
-  const values=readings[id].slice(-20).map(x=>x.t);
+function renderChart(id){
+  const values=readings[id]
+    .slice(-20).map(x=>x.t);
+
   const min=Math.min(...values)-1;
   const max=Math.max(...values)+1;
   const span=max-min||1;
 
   const points=values.map((v,i)=>{
-    const x=30+i/Math.max(1,values.length-1)*320;
+    const x=30+
+      i/Math.max(1,values.length-1)*320;
     const y=125-(v-min)/span*100;
     return x+","+y;
   }).join(" ");
 
   $("tempChart").innerHTML=`
-    <svg viewBox="0 0 380 150" preserveAspectRatio="none">
-      <line x1="30" y1="125" x2="360" y2="125"
+    <svg viewBox="0 0 380 150"
+      preserveAspectRatio="none">
+      <line x1="30" y1="125"
+        x2="360" y2="125"
         stroke="#d9e6dc"/>
-      <polyline points="${points}" fill="none"
-        stroke="#28654c" stroke-width="3"/>
-      <text x="2" y="27">${max.toFixed(1)}°</text>
-      <text x="2" y="128">${min.toFixed(1)}°</text>
-      <text x="260" y="145">Últimas ${values.length} lecturas</text>
+      <polyline points="${points}"
+        fill="none"
+        stroke="#28654c"
+        stroke-width="3"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+      <text x="2" y="27">
+        ${max.toFixed(1)}°
+      </text>
+      <text x="2" y="128">
+        ${min.toFixed(1)}°
+      </text>
+      <text x="260" y="145">
+        Últimas ${values.length} lecturas
+      </text>
     </svg>`;
 }
 
-function render() {
+function render(){
   const warnings=[1,2,3].filter(
-    id=>classify(id).level!=="normal"
+    id=>analyzeHistory(id).level!=="normal"
   ).length;
+
+  const total=[1,2,3].reduce(
+    (sum,id)=>sum+readings[id].length,0
+  );
 
   $("metrics").innerHTML=`
     <div class="card">
       <div class="label">Colmenas registradas</div>
       <div class="metric">03</div>
-      <div class="muted">Modo demostración</div>
+      <div class="muted">Unidades en seguimiento</div>
     </div>
     <div class="card">
       <div class="label">Colmenas con alertas</div>
       <div class="metric">${warnings}</div>
-      <div class="muted">Según criterios experimentales</div>
+      <div class="muted">Análisis del historial</div>
     </div>
     <div class="card">
-      <div class="label">Mediciones almacenadas</div>
-      <div class="metric">${
-        [1,2,3].reduce((s,id)=>s+readings[id].length,0)
-      }</div>
-      <div class="muted">En este navegador</div>
+      <div class="label">Mediciones registradas</div>
+      <div class="metric">${total}</div>
+      <div class="muted">Historial disponible</div>
     </div>`;
 
   $("hives").innerHTML=[1,2,3].map(id=>{
     const v=latest(id);
     const a=analyzeHistory(id);
 
-    return `
-      <div class="card" style="background:#f9fbf8;margin:0">
+    return`
+      <div class="card"
+        style="background:#f9fbf8;margin:0">
         <div class="row">
           <strong>Colmena 0${id}</strong>
-          <span class="status ${a.level}">${a.title}</span>
+          <span class="status ${a.level}">
+            ${a.title}
+          </span>
         </div>
         <p class="muted">
-          ${v.t.toFixed(1)} °C · ${v.h.toFixed(1)} % HR
+          ${v.t.toFixed(1)} °C ·
+          ${v.h.toFixed(1)} % HR
         </p>
         <button class="btn secondary"
           onclick="selectHive(${id})">
@@ -1024,56 +1068,71 @@ function render() {
   const v=latest(id);
   const a=analyzeHistory(id);
 
-  $("tempValue").textContent=v.t.toFixed(1)+" °C";
-  $("humValue").textContent=v.h.toFixed(1)+" %";
+  $("tempValue").textContent=
+    v.t.toFixed(1)+" °C";
+
+  $("humValue").textContent=
+    v.h.toFixed(1)+" %";
 
   $("hiveState").innerHTML=`
-    <span class="status ${a.level}">${a.title}</span>`;
+    <span class="status ${a.level}">
+      ${a.title}
+    </span>`;
 
   $("historyAnalysis").innerHTML=`
-    <ul>${a.details.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`;
+    <ul>
+      ${a.details.map(
+        x=>`<li>${esc(x)}</li>`
+      ).join("")}
+    </ul>`;
 
-  $("historyBody").innerHTML=readings[id]
-    .slice(-8)
-    .reverse()
+  $("historyBody").innerHTML=
+    readings[id].slice(-8).reverse()
     .map(x=>`
       <tr>
         <td>${esc(x.date||"Dato inicial")}</td>
         <td>${x.t.toFixed(1)}</td>
         <td>${x.h.toFixed(1)} %</td>
-        <td>${esc(x.source||"Demo")}</td>
-      </tr>`)
-    .join("");
+        <td>${esc(x.source||"Datos iniciales")}</td>
+      </tr>
+    `).join("");
 
-  $("alertList").innerHTML=[1,2,3].map(id=>{
-    const a=analyzeHistory(id);
+  $("alertList").innerHTML=
+    [1,2,3].map(id=>{
+      const a=analyzeHistory(id);
 
-    return `
-      <div class="alert ${a.level}">
-        <div class="row">
-          <strong>Colmena 0${id}</strong>
-          <span class="status ${a.level}">${a.title}</span>
-        </div>
-        ${a.details.map(x=>`<p>• ${esc(x)}</p>`).join("")}
-        <button class="btn secondary"
-          onclick="selectHive(${id})">
-          Revisar historial
-        </button>
-      </div>`;
-  }).join("");
+      return`
+        <div class="alert ${a.level}">
+          <div class="row">
+            <strong>Colmena 0${id}</strong>
+            <span class="status ${a.level}">
+              ${a.title}
+            </span>
+          </div>
+          ${a.details.map(
+            x=>`<p>• ${esc(x)}</p>`
+          ).join("")}
+          <button class="btn secondary"
+            onclick="selectHive(${id})">
+            Revisar historial
+          </button>
+        </div>`;
+    }).join("");
 
   renderChart(id);
 }
 
-function selectHive(id) {
+function selectHive(id){
   $("hiveSelect").value=id;
   go("monitoreo");
   render();
 }
 
-$("hiveSelect").addEventListener("change",render);
+$("hiveSelect").addEventListener(
+  "change",render
+);
 
-function addReading(id,t,h,source) {
+function addReading(id,t,h,source){
   readings[id].push({
     t:Number(t.toFixed(1)),
     h:Number(h.toFixed(1)),
@@ -1081,7 +1140,7 @@ function addReading(id,t,h,source) {
     source
   });
 
-  if(readings[id].length>250) {
+  if(readings[id].length>250){
     readings[id]=readings[id].slice(-250);
   }
 
@@ -1089,92 +1148,127 @@ function addReading(id,t,h,source) {
   render();
 }
 
-$("measureForm").addEventListener("submit",e=>{
-  e.preventDefault();
+$("measureForm").addEventListener(
+  "submit",e=>{
+    e.preventDefault();
 
-  const id=Number($("hiveSelect").value);
-  const t=Number($("temperature").value);
-  const h=Number($("humidity").value);
+    const id=Number(
+      $("hiveSelect").value
+    );
+    const t=Number(
+      $("temperature").value
+    );
+    const h=Number(
+      $("humidity").value
+    );
 
-  if(
-    !Number.isFinite(t)||
-    !Number.isFinite(h)||
-    t< -30||t>100||h<0||h>100
-  ) return;
+    if(!Number.isFinite(t)||
+       !Number.isFinite(h)||
+       t< -30||t>100||
+       h<0||h>100){
+      return;
+    }
 
-  addReading(id,t,h,"Manual");
-  $("measureForm").reset();
-  $("saveMessage").textContent="✓ Medición guardada.";
-});
+    addReading(id,t,h,"Registro manual");
+    $("measureForm").reset();
 
-function simulateStep() {
+    $("saveMessage").textContent=
+      "✓ Medición registrada correctamente.";
+  }
+);
+
+function simulateStep(){
   const scenario=$("simScenario").value;
   const noise=()=>Math.random()*.6-.3;
 
-  if(scenario==="stable") {
+  if(scenario==="stable"){
     simTemp+=(35+noise()-simTemp)*.45;
     simHum+=(64+noise()*3-simHum)*.45;
-  } else if(scenario==="heat") {
-    simTemp=Math.min(80,simTemp+1.4+Math.random()*.4);
+  }else if(scenario==="heat"){
+    simTemp=Math.min(
+      80,simTemp+1.4+Math.random()*.4
+    );
     simHum=Math.min(100,simHum+.3);
-  } else if(scenario==="humidity") {
+  }else if(scenario==="humidity"){
     simTemp+=noise()*.3;
-    simHum=Math.min(100,simHum+4+Math.random());
-  } else {
+    simHum=Math.min(
+      100,simHum+4+Math.random()
+    );
+  }else{
     simTemp=Math.min(80,simTemp+8);
     simHum=Math.min(100,simHum+9);
   }
 
-  simTemp=Math.max(-30,Math.min(100,simTemp));
-  simHum=Math.max(0,Math.min(100,simHum));
+  simTemp=Math.max(
+    -30,Math.min(100,simTemp)
+  );
+  simHum=Math.max(
+    0,Math.min(100,simHum)
+  );
 
-  addReading(simHive,simTemp,simHum,"Simulación");
+  addReading(
+    simHive,simTemp,simHum,
+    "Prueba automática"
+  );
 
   simCount++;
+
   $("simCount").textContent=
     "Lecturas generadas: "+simCount;
 }
 
-function stopSimulation() {
-  if(simTimer!==null) {
+function stopSimulation(){
+  if(simTimer!==null){
     clearInterval(simTimer);
     simTimer=null;
   }
 
   $("simStatus").classList.remove("on");
-  $("simText").textContent="Simulador detenido";
+  $("simText").textContent="Prueba detenida";
   $("startSim").disabled=false;
   $("stopSim").disabled=true;
   $("hiveSelect").disabled=false;
 }
 
 $("startSim").addEventListener("click",()=>{
-  if(simTimer!==null) return;
+  if(simTimer!==null)return;
 
-  simHive=Number($("hiveSelect").value);
+  simHive=Number(
+    $("hiveSelect").value
+  );
 
   const v=latest(simHive);
   simTemp=v.t;
   simHum=v.h;
   simCount=0;
 
-  $("simCount").textContent="Lecturas generadas: 0";
+  $("simCount").textContent=
+    "Lecturas generadas: 0";
+
   $("simStatus").classList.add("on");
   $("simText").textContent=
-    "Simulando Colmena 0"+simHive+" · Cada 3 segundos";
+    "Prueba activa · Colmena 0"+
+    simHive+" · Cada 3 segundos";
 
   $("startSim").disabled=true;
   $("stopSim").disabled=false;
   $("hiveSelect").disabled=true;
 
   simulateStep();
-  simTimer=setInterval(simulateStep,3000);
+
+  simTimer=setInterval(
+    simulateStep,3000
+  );
 });
 
-$("stopSim").addEventListener("click",stopSimulation);
+$("stopSim").addEventListener(
+  "click",stopSimulation
+);
 
 $("resetData").addEventListener("click",()=>{
-  if(!confirm("¿Restaurar las mediciones de demostración?")) {
+  if(!confirm(
+    "¿Restaurar las mediciones iniciales?"
+  )){
     return;
   }
 
@@ -1182,17 +1276,19 @@ $("resetData").addEventListener("click",()=>{
   readings=clone(initial);
   save();
   render();
-  $("saveMessage").textContent="Datos restaurados.";
+
+  $("saveMessage").textContent=
+    "Datos iniciales restaurados.";
 });
 
-function valid(lat,lng) {
+function valid(lat,lng){
   return Number.isFinite(lat)&&
     Number.isFinite(lng)&&
     Math.abs(lat)<=90&&
     Math.abs(lng)<=180;
 }
 
-function distance(a,b) {
+function distance(a,b){
   const r=Math.PI/180;
   const dl=(b.lat-a.lat)*r;
   const dg=(b.lng-a.lng)*r;
@@ -1203,18 +1299,23 @@ function distance(a,b) {
     Math.cos(b.lat*r)*
     Math.sin(dg/2)**2;
 
-  return 6371*2*Math.atan2(Math.sqrt(q),Math.sqrt(1-q));
+  return 6371*2*Math.atan2(
+    Math.sqrt(q),
+    Math.sqrt(1-q)
+  );
 }
 
-function drawMap() {
-  if(!window.L) {
+function drawMap(){
+  if(!window.L){
     $("mapMessage").textContent=
       "No se pudo cargar el mapa. Revisa internet.";
     return;
   }
 
-  if(!map) {
-    map=L.map("map").setView([-35,-71],6);
+  if(!map){
+    map=L.map("map").setView(
+      [-35,-71],6
+    );
 
     L.tileLayer(
       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -1231,17 +1332,20 @@ function drawMap() {
   const bounds=[];
 
   positions.forEach(p=>{
-    if(!valid(p.lat,p.lng)) return;
+    if(!valid(p.lat,p.lng))return;
 
     L.marker([p.lat,p.lng])
       .addTo(layer)
-      .bindPopup("Colmena 0"+p.id+" · Ubicación manual");
+      .bindPopup(
+        "Colmena 0"+p.id+
+        " · Ubicación registrada"
+      );
 
     bounds.push([p.lat,p.lng]);
   });
 
   notices.forEach(n=>{
-    if(!valid(n.lat,n.lng)) return;
+    if(!valid(n.lat,n.lng))return;
 
     L.circleMarker(
       [n.lat,n.lng],
@@ -1253,7 +1357,7 @@ function drawMap() {
     bounds.push([n.lat,n.lng]);
   });
 
-  if(bounds.length) {
+  if(bounds.length){
     map.fitBounds(bounds,{
       padding:[30,30],
       maxZoom:12
@@ -1263,47 +1367,58 @@ function drawMap() {
   map.invalidateSize();
 
   $("mapMessage").textContent=
-    "Ubicaciones manuales. Sin alertas oficiales conectadas.";
+    "Mapa de ubicaciones y avisos registrados.";
 }
 
-function renderGeo() {
-  $("mapLocations").innerHTML=positions.map(p=>`
-    <p class="muted">
-      📍 Colmena 0${p.id}:
-      ${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}
-      <button class="btn secondary"
-        onclick="removePosition(${p.id})">Quitar</button>
-    </p>
-  `).join("");
+function renderGeo(){
+  $("mapLocations").innerHTML=
+    positions.map(p=>`
+      <p class="muted">
+        📍 Colmena 0${p.id}:
+        ${p.lat.toFixed(4)},
+        ${p.lng.toFixed(4)}
+        <button class="btn secondary"
+          onclick="removePosition(${p.id})">
+          Quitar
+        </button>
+      </p>
+    `).join("");
 
-  $("noticeList").innerHTML=notices.map((n,i)=>{
-    const near=positions.filter(p=>distance(p,n)<=10);
+  $("noticeList").innerHTML=
+    notices.map((n,i)=>{
+      const near=positions.filter(
+        p=>distance(p,n)<=10
+      );
 
-    return `
-      <div class="alert">
-        <strong>Aviso manual · No verificado</strong>
-        <p>${esc(n.text)}</p>
-        <p>${
-          near.length
+      return`
+        <div class="alert">
+          <strong>Aviso registrado manualmente</strong>
+          <p>${esc(n.text)}</p>
+          <p>${
+            near.length
             ?"Colmenas a menos de 10 km: "+
               near.map(p=>"0"+p.id).join(", ")
             :"Sin colmenas registradas a menos de 10 km."
-        }</p>
-        <button class="btn secondary"
-          onclick="removeNotice(${i})">Quitar</button>
-      </div>`;
-  }).join("");
+          }</p>
+          <button class="btn secondary"
+            onclick="removeNotice(${i})">
+            Quitar
+          </button>
+        </div>`;
+    }).join("");
 
-  if(map) drawMap();
+  if(map)drawMap();
 }
 
-function removePosition(id) {
-  positions=positions.filter(p=>p.id!==id);
+function removePosition(id){
+  positions=positions.filter(
+    p=>p.id!==id
+  );
   save();
   renderGeo();
 }
 
-function removeNotice(i) {
+function removeNotice(i){
   notices.splice(i,1);
   save();
   renderGeo();
@@ -1312,15 +1427,23 @@ function removeNotice(i) {
 $("mapForm").addEventListener("submit",e=>{
   e.preventDefault();
 
-  const id=Number($("mapHive").value);
-  const lat=Number($("latitude").value);
-  const lng=Number($("longitude").value);
+  const id=Number(
+    $("mapHive").value
+  );
+  const lat=Number(
+    $("latitude").value
+  );
+  const lng=Number(
+    $("longitude").value
+  );
 
-  if(!valid(lat,lng)) return;
+  if(!valid(lat,lng))return;
 
-  positions=positions.filter(p=>p.id!==id);
+  positions=positions.filter(
+    p=>p.id!==id
+  );
+
   positions.push({id,lat,lng});
-
   save();
   renderGeo();
 });
@@ -1328,14 +1451,19 @@ $("mapForm").addEventListener("submit",e=>{
 $("noticeForm").addEventListener("submit",e=>{
   e.preventDefault();
 
-  const lat=Number($("noticeLat").value);
-  const lng=Number($("noticeLng").value);
+  const lat=Number(
+    $("noticeLat").value
+  );
+  const lng=Number(
+    $("noticeLng").value
+  );
   const text=$("noticeText").value.trim();
 
-  if(!valid(lat,lng)||!text) return;
+  if(!valid(lat,lng)||!text)return;
 
   notices.push({
-    lat,lng,text:text.slice(0,120)
+    lat,lng,
+    text:text.slice(0,120)
   });
 
   save();
@@ -1343,29 +1471,38 @@ $("noticeForm").addEventListener("submit",e=>{
   $("noticeForm").reset();
 });
 
-function renderDocs() {
-  $("documentList").innerHTML=docs.map((d,i)=>`
-    <div class="alert">
-      <strong>${esc(d.name)}</strong>
-      <p>
-        ${(d.size/1024).toFixed(1)} KB · Documento local
-      </p>
-      <button class="btn secondary"
-        onclick="openDoc(${i})">Abrir</button>
-      <button class="btn secondary"
-        onclick="removeDoc(${i})">Quitar</button>
-    </div>
-  `).join("");
+function renderDocs(){
+  $("documentList").innerHTML=
+    docs.map((d,i)=>`
+      <div class="alert">
+        <strong>${esc(d.name)}</strong>
+        <p>
+          ${(d.size/1024).toFixed(1)} KB
+        </p>
+        <button class="btn secondary"
+          onclick="openDoc(${i})">
+          Abrir
+        </button>
+        <button class="btn secondary"
+          onclick="removeDoc(${i})">
+          Quitar
+        </button>
+      </div>
+    `).join("");
 }
 
-function openDoc(i) {
-  if(docs[i]) {
-    window.open(docs[i].url,"_blank");
+function openDoc(i){
+  if(docs[i]){
+    window.open(
+      docs[i].url,"_blank"
+    );
   }
 }
 
-function removeDoc(i) {
-  URL.revokeObjectURL(docs[i].url);
+function removeDoc(i){
+  URL.revokeObjectURL(
+    docs[i].url
+  );
   docs.splice(i,1);
   renderDocs();
 }
@@ -1373,18 +1510,19 @@ function removeDoc(i) {
 $("addDocument").addEventListener("click",()=>{
   const f=$("documentFile").files[0];
 
-  if(!f) {
+  if(!f){
     $("documentMessage").textContent=
       "Selecciona un archivo.";
     return;
   }
 
-  const ext=f.name.split(".").pop().toLowerCase();
+  const ext=f.name.split(".")
+    .pop().toLowerCase();
 
   if(
     !["pdf","txt","md"].includes(ext)||
     f.size>15*1024*1024
-  ) {
+  ){
     $("documentMessage").textContent=
       "Solo PDF, TXT o MD de hasta 15 MB.";
     return;
@@ -1397,7 +1535,7 @@ $("addDocument").addEventListener("click",()=>{
   });
 
   $("documentMessage").textContent=
-    "✓ Documento añadido para esta sesión.";
+    "✓ Documento agregado correctamente.";
 
   $("documentFile").value="";
   renderDocs();
